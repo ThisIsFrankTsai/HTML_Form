@@ -27,6 +27,14 @@
         <input type='checkbox' name='fcolor' value='Yellow'>Yellow
         <input type='checkbox' name='fcolor' value='Orange'>Orange
         <br/>
+
+        喜歡的電影（單選）：
+        <input type='radio' name='fmovie' value='不可能的任務'>不可能的任務
+        <input type='radio' name='fmovie' value='柯南'>柯南
+        <input type='radio' name='fmovie' value='粽邪3'>粽邪3
+        <input type='radio' name='fmovie' value='奧本海默'>奧本海默
+        <input type='radio' name='fmovie' value='芭比'>芭比
+        <br/>
       
 
         <label for='user_id'>Your ID:</label>
@@ -55,6 +63,8 @@
         沒有選擇任何顏色
     {% endfor%}
     <br/>
+
+    喜歡的電影： {{se_fmovie}} <br>
 
 
 
