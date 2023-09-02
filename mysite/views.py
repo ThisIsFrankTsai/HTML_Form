@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from mysite import models
+from mysite import models,forms
 # Create your views here.
 
 def get_example(request):
@@ -64,3 +64,35 @@ def index(request, pid=None, del_pass=None):
     
 
     return render(request, 'index.html', locals())
+
+def listing(request):
+ 
+    posts =models.Post.objects.filter(enabled=True).order_by('-pub_time')[:150]
+    moods = models.Mood.objects.all()
+
+    return render(request, 'listing.html', locals())
+
+def posting(request):
+
+    moods = models.Mood.objects.all()
+    message = '如要張貼訊息，則每一個欄位都要填...'
+
+    return render(request, 'posting.html', locals())
+
+def contact(request):
+    
+    form = forms.ContactForm()
+    return render(request, 'contact.html', locals())
+
+def contact(request):
+
+    if request.method == 'POST':
+        form = forms.ContactForm(request.POST)
+        if form.is_valid():
+            message = "感謝您的來信。"
+        else:
+            message = "請檢查您輸入的資訊是否正確！"
+    else:
+        form = forms.ContactForm()
+
+    return render(request, 'contact.html', locals())
