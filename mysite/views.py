@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from mysite import models,forms
+from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponseRedirect
+
 # Create your views here.
 
 def get_example(request):
@@ -96,3 +99,51 @@ def contact(request):
         form = forms.ContactForm()
 
     return render(request, 'contact.html', locals())
+
+
+def contact(request):
+    if request.method == 'POST':
+        form = forms.ContactForm(request.POST)
+        if form.is_valid():
+            message = "感謝您的來信，我們會儘速處理您的寶貴意見。"
+            user_name = form.cleaned_data['user_name']
+            user_city = form.cleaned_data['user_city']
+            user_school = form.cleaned_data['user_school']
+            user_email = form.cleaned_data['user_email']
+            user_message = form.cleaned_data['user_message']
+            mail_body = u'''
+                網友姓名：{}
+                居住城市：{}
+                是否在學：{}
+                反應意見：如下
+                {}'''.format(user_name, user_city, user_school,user_message)
+            msg = EmailMultiAlternatives(
+                subject="來自【NTU亂亂賣】網站的網友意見",
+                body=mail_body,
+                from_email=user_email,
+                to=["vg8rwb@gmail.com"],
+                reply_to=["Helpdesk <support@example.com>"])
+            msg.send()
+        else:
+            message = "請檢查您輸入的資訊是否正確！"
+    else:
+
+        form = forms.ContactForm()
+
+    return render(request, 'contact.html', locals())
+
+def post2db(request):
+
+    if request.method == 'POST':
+        post_form = forms.PostForm(request.POST)
+        if post_form.is_valid():
+            message = "您的訊息已儲存，要等管理者啟用後才看得到喔。"
+            post_form.save()
+            return HttpResponseRedirect('/list/')
+        else:
+            message = '如要張貼訊息，則每一個欄位都要填...'
+    else:
+        post_form = forms.PostForm()
+        message = '如要張貼訊息，則每一個欄位都要填... '
+
+    return render(request, 'post2db.html', locals())
