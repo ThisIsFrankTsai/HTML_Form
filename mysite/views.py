@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from mysite import models,forms
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseRedirect
+import json
+import urllib
+from django.conf import settings
 
 # Create your views here.
 
@@ -137,11 +140,22 @@ def post2db(request):
     if request.method == 'POST':
         post_form = forms.PostForm(request.POST)
         if post_form.is_valid():
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            values = {
+                    'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                    'response': recaptcha_response
+                    }
+            data = urllib.parse.urlencode(values).encode()
+            req = urllib.request.Request(url, data=data)
+            response = urllib.request.urlopen(req)
+            result = json.loads(response.read().decode())
+        if result['success']:
             message = "您的訊息已儲存，要等管理者啟用後才看得到喔。"
             post_form.save()
             return HttpResponseRedirect('/list/')
         else:
-            message = '如要張貼訊息，則每一個欄位都要填...'
+                message = "reCAPTCHA驗證失敗，請在確認."
     else:
         post_form = forms.PostForm()
         message = '如要張貼訊息，則每一個欄位都要填... '
